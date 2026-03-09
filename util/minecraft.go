@@ -10,16 +10,10 @@ import (
 )
 
 type ServerStatus struct {
-	Description interface{} `json:"description"`
-	Players     struct {
+	Players struct {
 		Max    int `json:"max"`
 		Online int `json:"online"`
 	} `json:"players"`
-	Version struct {
-		Name     string `json:"name"`
-		Protocol int    `json:"protocol"`
-	} `json:"version"`
-	Favicon string `json:"favicon,omitempty"`
 }
 
 func Query(ctx context.Context, address string, port uint16) (*ServerStatus, error) {
