@@ -1,26 +1,63 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/push"
 	"time"
-
-	"github.com/shirou/gopsutil/v4/mem"
-
-	"github.com/shirou/gopsutil/v4/cpu"
+	"tnt/util"
 )
+
+func cpu() (prometheus.Gauge, *prometheus.GaugeVec) {
+	usagePerCore, avg, _ := util.CpuUsage()
+
+	var (
+		total = prometheus.NewGauge(prometheus.GaugeOpts{
+			Name: "cpu_usage_average",
+			Help: "Average CPU usage",
+		})
+
+		perCore = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Name: "cpu_usage_core",
+			Help: "CPU Usage per core",
+		}, []string{"core"})
+	)
+
+	///
+	total.Set(avg)
+	for core, usage := range usagePerCore {
+		perCore.With(prometheus.Labels{"core": fmt.Sprintf("%d", core)}).Set(usage)
+	}
+	return total, perCore
+}
+
+func ram() prometheus.Gauge {
+	mem, _ := util.MemoryUsage()
+	var (
+		gauge = prometheus.NewGauge(prometheus.GaugeOpts{
+			Name: "memory_usage",
+			Help: "Memory usage",
+		})
+	)
+
+	gauge.Set(float64(mem))
+	return gauge
+}
+
+func disk() prometheus.Gauge {
+	disk, _ := util.DiskUsage()
+	var (
+		gauge = prometheus.NewGauge(prometheus.GaugeOpts{
+			Name: "memory_usage",
+			Help: "Memory usage",
+		})
+	)
+
+	gauge.Set(float64(disk))
+	return gauge
+}
 
 func main() {
 
-	fmt.Println("Mem")
-	v, _ := mem.VirtualMemory()
-	c, _ := cpu.Percent(time.Second, true)
-	var x float64 = 0
-	var coreNum int = 0
-	for i := 0; i < len(c); i++ {
-		var usage float64 = c[i]
-		x += usage
-		coreNum++
-		fmt.Printf("core %d - %f %% \n", i, usage)
-	}
-	fmt.Printf("Avg. usage: %f", x/float64(coreNum))
 }
