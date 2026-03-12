@@ -1,0 +1,5 @@
+- [ ] Add RCON
+- [ ] Add prometheus integration
+  - Needs to report cpu, players online, ram usage
+- [ ] Deploy/build/manage minecraft servers
+- [ ] As above, add modding capabilities. 
